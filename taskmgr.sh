@@ -91,7 +91,6 @@ function InitPage()
 
  	echo ' '
         echo '                          리눅스활용실습 '
-        echo '               Made by 최진우, 이동호, 이정현, 구본관'
         echo ' '
         echo ' '
         echo '계속 하려면 엔터 키를 입력해주세요....'
