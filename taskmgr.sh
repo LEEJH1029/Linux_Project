@@ -4,7 +4,7 @@
 IFS=$'\n'
 
 # 변수 초기화
-declare -i NAME_CURSOR=0
+declare -i USER_CURSOR=0
 declare -i PS_CURSOR=-1
 declare -i START_POINT=0
 declare -a PROCESS_COMPARE_PID_LIST=()
@@ -34,18 +34,18 @@ function Show()
 	echo 'q 또는 Q를 입력하면 프로그램을 종료할 수 있습니다.'
 	echo '  '
 
-	echo '-NAME-----------------COMMAND--------------PID-----START-----CPU-----MEMORY--'
+	echo '-USER-----------------COMMAND--------------PID-----START-----CPU-----MEMORY--'
 
 	# 리스트에 저장된 값을 출력하는 부분
 	for num in $(seq 0 20)
 	do
 		printf '|'
 
-		if [ $num -eq $NAME_CURSOR ]; then
+		if [ $num -eq $USER_CURSOR ]; then
 			printf '\e[100m'
 		fi
 
-		printf '%20s\e[0m|' ${NAME_LIST[$num]:0:20}
+		printf '%20s\e[0m|' ${USER_LIST[$num]:0:20}
 
 		if [ $num -eq $PS_CURSOR ]; then
 			printf '\e[45m'
@@ -168,7 +168,7 @@ function CheckPID()
 
 			local output=$(Compare "$program_pid_1" "$program_pid_2")
 			PROCESS_COMPARE_PID_LIST=()
-			gnome-terminal -- bash -c "echo '$output'; read -p 'Press enter to close this window'"
+			gnome-terminal -- bash -c "echo '$output'; read -p '계속하려면 엔터키를 입력해주세요....'"
 	fi
 
 	echo ' '
@@ -177,7 +177,7 @@ function CheckPID()
 	read -n 1 -s
 }
 
-# 프로세스를 강제 종료시킬 때 NAME과 현재 사용자가 일치하지 않으면 에러를 출력하는 부분 
+# 프로세스를 강제 종료시킬 때 USER와 현재 사용자가 일치하지 않으면 에러를 출력하는 부분 
 function NoPermission()
 {
 	clear
@@ -218,7 +218,6 @@ InitPage
 
 # ps에서 cpu순으로 정렬하여 변수에 저장
 ps_result="ps aux --sort=-%cpu"
-SORT_ASC=''
 
 while [ true ]
 do
@@ -231,11 +230,11 @@ do
 	# PS_RESULT에서 맨 위에 정보들이 나와있는 행을 지움(sed 명령어 사용)
 	PS_RESULT=`sed '1d' <<< "$PS_RESULT"`
 
-	# PS_RESULT에서 NAME 부분을 가져옴
-	NAME_LIST=(`echo "$PS_RESULT" | awk '{print $1}' | sort -${SORT_ASC}u`)
+	# PS_RESULT에서 USER 부분을 가져옴
+	USER_LIST=(`echo "$PS_RESULT" | awk '{print $1}' | sort -$u`)
 
-	# NAME값과 일치하는 행을 PS_RESULT에서 가져옴
-	PROCESS_RESULT=`echo "$PS_RESULT" | grep ^${NAME_LIST[$NAME_CURSOR]} | grep -v 'ps aux'`
+	# USER값과 일치하는 행을 PS_RESULT에서 가져옴
+	PROCESS_RESULT=`echo "$PS_RESULT" | grep ^${USER_LIST[$USER_CURSOR]} | grep -v 'ps aux'`
 
 	# PROCESS_RESULT에서 PID, CPU, MEM, START, CMD 부분에 맞게 배열에 저장(<<<은 문자열을 표준 입력으로 전달하는 리다이렉션)
 	PID_LIST=(`awk '{print $2}' <<< "$PROCESS_RESULT"`)
@@ -267,11 +266,11 @@ do
 
 	# 일반키 구현1: 프로그램 종료(Quit)
 	if [ "$KEY" = 'q' -o "$KEY" = 'Q' ]; then
-		exit
+		kill -SIGINT $$
 
 	# 일반키 구현2: 프로세스 종료(Kill)
 	elif [ "$KEY" = 'k' -o "$KEY" = 'K' ]; then
-                if [ "${NAME_LIST[$NAME_CURSOR]}" = `whoami` ]; then
+                if [ "${USER_LIST[$USER_CURSOR]}" = `whoami` ]; then
                                 kill -9 ${PID_LIST[$START_POINT+$PS_CURSOR]}
                         else
                                 NoPermission
@@ -287,8 +286,8 @@ do
 	# 방향키 구현: 상
 	elif [[ "$KEY" = $'\e[A' ]]; then
 		if [ $PS_CURSOR -eq -1 ]; then
-			if [ $NAME_CURSOR -gt 0 ]; then
-				NAME_CURSOR=$NAME_CURSOR-1
+			if [ $USER_CURSOR -gt 0 ]; then
+				USER_CURSOR=$USER_CURSOR-1
 				START_POINT=0
 			fi
 		else
@@ -304,8 +303,8 @@ do
 	# 방향키 구현: 하
 	elif [ "$KEY" = $'\e[B' ]; then
 		if [ $PS_CURSOR -eq -1 ]; then
-			if [ $NAME_CURSOR -lt $((${#NAME_LIST[@]} - 1)) -a $NAME_CURSOR -lt 19 ]; then
-				NAME_CURSOR=$NAME_CURSOR+1
+			if [ $USER_CURSOR -lt $((${#USER_LIST[@]} - 1)) -a $USER_CURSOR -lt 19 ]; then
+				USER_CURSOR=$USER_CURSOR+1
 				START_POINT=0
 			fi
 		else
