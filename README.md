@@ -2,10 +2,9 @@
 2023-1 Linux Team Project
 
 ---
-참고자료
-- sar reference: https://manpages.ubuntu.com/manpages/bionic/man1/sar.sysstat.1.html
-- sysstat: https://brunch.co.kr/@lars/9
-- awk: https://recipes4dev.tistory.com/171
-- linux cpu, memory: https://velog.io/@chappi/Bash-Shell-질을-해보자.-CPU-Memory-기록하기
-
-
+### 작업관리자 만들기
+- 실행 중인 프로세스 출력(USER, COMMAND, PID, START, %CPU, %MEM)
+- 두 프로세스 간 입력한 시간 동안 메모리, CPU 사용량 비교
+- 프로세스 종료(Permission이 있는지 확인)
+- 프로그램 종료
+- 조합키를 통한 정렬방식 변경(dafault: -%cpu)
