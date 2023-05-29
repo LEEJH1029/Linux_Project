@@ -55,9 +55,9 @@ function Show()
 
 		printf '%-20s|' ${CMD_LIST[$INDEX]:0:20}
 		printf '%7s|' ${PID_LIST[$INDEX]:0:7}
-		printf '%9s\e[0m|' ${START_LIST[$INDEX]:0:9}
-		printf '%5s %%\e[0m|' ${CPU_LIST[$INDEX]:0:5}
-	        printf '%5s %%\e[0m|\n' ${MEM_LIST[$INDEX]:0:5}
+		printf '%9s|' ${START_LIST[$INDEX]:0:9}
+		printf '%5s %%|' ${CPU_LIST[$INDEX]:0:5}
+	 printf '%5s %%\e[0m|\n' ${MEM_LIST[$INDEX]:0:5}
 	done
 
 	echo '-----------------------------------------------------------------------------'
